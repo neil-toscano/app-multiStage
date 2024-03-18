@@ -1,9 +1,9 @@
 # FROM --platform linux/amd64 node:18.16.0-alpine // le digo yo que plataforma
 # FROM --platform=$BUILDPLATFORM node:18.16.0-alpine
-# FROM --platform=$BUILDPLATFORM node:18.16.0-alpine
 
 # DEPENDENCIAS
-FROM  node:18.16.0-alpine as dependencias
+# FROM  node:18.16.0-alpine as dependencias
+FROM --platform=$BUILDPLATFORM node:18.16.0-alpine as dependencias
 WORKDIR /app
 COPY package.json ./
 RUN npm install
