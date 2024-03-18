@@ -1,18 +1,27 @@
 # FROM --platform linux/amd64 node:18.16.0-alpine // le digo yo que plataforma
-FROM --platform=$BUILDPLATFORM node:18.16.0-alpine
+# FROM --platform=$BUILDPLATFORM node:18.16.0-alpine
+# FROM --platform=$BUILDPLATFORM node:18.16.0-alpine
 
-# FROM  node:18.16.0-alpine
-WORKDIR /app  # entro al directorio igual que cd
-COPY . .
-# COPY app.js package.json ./
+# DEPENDENCIAS
+FROM  node:18.16.0-alpine as dependencias
+WORKDIR /app
+COPY package.json ./
 RUN npm install
-RUN npm run test
-RUN rm -rf tests
-RUN rm -rf node_modules
-# unicamente las dependencias de prod
-RUN npm install --prod 
-#EXPOSE 3000
 
+# EJECUTAR TEST
+FROM  node:18.16.0-alpine as builder
+WORKDIR /app
+COPY --from=dependencias /app/node_modules ./node_modules
+COPY . .
+RUN npm run test
+
+# EJECUTAR LA APP
+FROM node:18.16.0-alpine as runner
+WORKDIR /app
+COPY package.json ./
+RUN npm install --prod
+COPY app.js ./
+COPY tasks/ ./tasks
 CMD [ "node","app.js" ]
 
 # FROM node:18-alpine
